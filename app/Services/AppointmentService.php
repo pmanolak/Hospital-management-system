@@ -106,19 +106,22 @@ class AppointmentService
     public function sendRemindersForUpcomingAppointments(array $filters = []): int
     {
         $filterMap = [
-            'doctor_id' => \App\Filters\DoctorFilter::class,
-            'patient_id' => \App\Filters\PatientFilter::class,
-            'status' => \App\Filters\AppointmentStatusFilter::class,
-            'date' => \App\Filters\DateFilter::class,
+            'doctor_id'  => DoctorFilter::class,
+            'patient_id' => PatientFilter::class,
+            'status'     => AppointmentStatusFilter::class,
+            'date'       => DateFilter::class,
         ];
-        $query = Appointment::with(['patient', 'doctor'])
-        ->where('status', 'approved')
-        ->whereBetween('appointment_time', [
 
-            Carbon::now()->addMinutes(59),
-            Carbon::now()->addMinutes(61),
-        ]);
-        $appointments = \App\Helpers\FilterPipeline::apply($query, $filters, $filterMap)->get();
+        $now = Carbon::now();
+        $start = $now->copy()->addHour()->subMinutes(5);    
+        $end = $now->copy()->addHour()->addMinutes(5);      
+
+        $query = Appointment::with(['patient', 'doctor'])
+            ->where('status', 'approved')
+            ->whereBetween('appointment_time', [$start, $end]);
+
+        $appointments = FilterPipeline::apply($query, $filters, $filterMap)->get();
+
         foreach ($appointments as $appointment) {
             if ($appointment->patient && $appointment->patient->email) {
                 $this->notificationService->sendAppointmentReminder(
@@ -131,20 +134,21 @@ class AppointmentService
                 );
             }
         }
+
         return $appointments->count();
     }
-
 
     public function getFilteredAppointments(array $filters)
     {
         $filterMap = [
-            'doctor_id' => \App\Filters\DoctorFilter::class,
-            'patient_id' => \App\Filters\PatientFilter::class,
-            'status' => \App\Filters\AppointmentStatusFilter::class,
-            'date' => \App\Filters\DateFilter::class,
+            'doctor_id'  => DoctorFilter::class,
+            'patient_id' => PatientFilter::class,
+            'status'     => AppointmentStatusFilter::class,
+            'date'       => DateFilter::class,
         ];
-        $query = Appointment::with(['doctor', 'patient'])->latest();
-        return \App\Helpers\FilterPipeline::apply($query, $filters, $filterMap)->paginate();
-    }
 
+        $query = Appointment::with(['doctor', 'patient'])->latest();
+
+        return FilterPipeline::apply($query, $filters, $filterMap)->paginate();
+    }
 }

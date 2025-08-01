@@ -76,3 +76,7 @@ Route::middleware('auth:api')->group(function () {
 
     // PDF & Email
     Route::post('/email-bills-pdf', [ExportController::class, 'emailBillsPdf']);});
+
+    Route::get('/test-error', function () {
+        throw new \Exception("Sample exception for error log test");
+    });
