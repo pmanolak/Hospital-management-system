@@ -17,7 +17,6 @@ class DoctorController extends Controller
     {
         $this->doctorService = $doctorService;
     }
-
      
     public function index(Request $request)
     {

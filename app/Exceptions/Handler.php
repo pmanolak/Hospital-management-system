@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Exceptions;
-
+use App\Models\ErrorLog;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
 
@@ -42,7 +42,20 @@ class Handler extends ExceptionHandler
     public function register(): void
     {
         $this->reportable(function (Throwable $e) {
-            //
+            if ($this->shouldntReport($e)) {
+                return;
+            }
+            try {
+                ErrorLog::create([
+                    'message'    => $e->getMessage(),
+                    'exception'  => get_class($e),
+                    'file'       => $e->getFile(),
+                    'line'       => $e->getLine(),
+                ]);
+            } catch (\Throwable $ex) {
+                \Log::error('Failed to log error to database: ' . $ex->getMessage());
+            }
         });
     }
+
 }
