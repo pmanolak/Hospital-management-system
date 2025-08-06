@@ -12,6 +12,10 @@ class Prescription extends Model
         'instructions',
     ];
 
+    protected $casts = [
+        'medicines' => 'array',
+    ];
+
     public function appointment()
     {
         return $this->belongsTo(\App\Models\Appointment::class);

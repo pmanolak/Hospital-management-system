@@ -15,7 +15,7 @@ class PrescriptionService
     {
         return Prescription::create([
             'appointment_id' => $dto->appointment_id,
-            'medicines' => $dto->medicines,
+            'medicines' => $dto->medicines,  
             'instructions' => $dto->instructions,
         ]);
     }
