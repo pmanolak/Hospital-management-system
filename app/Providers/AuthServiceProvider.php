@@ -2,8 +2,9 @@
 
 namespace App\Providers;
 
-// use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Gate;
+use Spatie\Permission\PermissionRegistrar;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -23,6 +24,7 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        //
+         
+        app(PermissionRegistrar::class)->registerPermissions(Gate::getFacadeRoot());
     }
 }

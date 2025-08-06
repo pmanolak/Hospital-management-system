@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Exceptions\UnauthorizedException;
 use App\DTO\CreatePrescriptionDTO;
 use App\Models\Prescription;
 use Illuminate\Http\Request;
@@ -11,6 +13,12 @@ use App\Http\Requests\StorePrescriptionRequest;
 
 class PrescriptionController extends Controller
 {
+    public function __construct()
+    {
+         
+        $this->middleware(['auth:api', 'role:Doctor']);
+    }
+
     public function index(Request $request, PrescriptionService $service)
     {
         $prescriptions = $service->getFilteredPrescriptions($request->all());
